@@ -4,11 +4,12 @@ from models  import ItemModel
 from schemas import ItemSchema, ItemUpdateSchema
 from db import db
 from sqlalchemy.exc import SQLAlchemyError
+from flask_jwt_extended import jwt_required
 
 blp = Blueprint("items", __name__ , description = "Operations on items")
 
 
-@blp.route("/item/<string:item_id>")
+@blp.route("/item/<int:item_id>")
 class Item(MethodView):
     @blp.response(200, ItemSchema)
     def get(self, item_id):
@@ -22,6 +23,7 @@ class Item(MethodView):
         db.session.commit()
         return {"Message":"Item deleted"}
 
+    @jwt_required()
     @blp.arguments(ItemUpdateSchema)
     @blp.response(200, ItemSchema)
     def put(self,item_data, item_id):
@@ -47,7 +49,7 @@ class ItemList(MethodView):
     @blp.response(200, ItemSchema(many=True))
     def get(self):
            return ItemModel.query.all()
-
+    @jwt_required()
     @blp.arguments(ItemSchema)
     @blp.response(201, ItemSchema)
     def post(self,item_data):      
@@ -82,3 +84,7 @@ class ItemList(MethodView):
             return item,201
 
 
+
+
+
+# eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY5OTAxMTkyOSwianRpIjoiYThmNDZiNWUtZDk1YS00OThlLTgzMjQtMTdmNTg3NzY5NWZhIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MSwibmJmIjoxNjk5MDExOTI5LCJleHAiOjE2OTkwMTI4Mjl9.b2iLbaLEOsPG12Zj0cT7XXm0v74O_EtFEZD-8IF7Lb4
